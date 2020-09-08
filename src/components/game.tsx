@@ -1,8 +1,9 @@
-import React, { FC, useState } from "react";
+import React, { useState } from "react";
 import Board from "./board";
-import "./index.css";
+import Moves from "./moves";
+import "../index.css";
 
-function calculateWinner(squares: string[]) {
+function calculateWinner(squares: string[]): string | null {
   const lines = [
     [0, 1, 2],
     [3, 4, 5],
@@ -22,7 +23,15 @@ function calculateWinner(squares: string[]) {
   return null;
 }
 
-const Game: FC = () => {
+function getStatus(winner: string | null, xIsNext: boolean): string {
+  if (winner) {
+    return `Winner: ${winner}`;
+  } else {
+    return `Next player: ${xIsNext ? "X" : "O"}`;
+  }
+}
+
+const Game = () => {
   const [history, setHistory] = useState([{ squares: Array(9).fill(null) }]);
   const [stepNumber, setStepNumber] = useState(0);
   const [xIsNext, setXIsNext] = useState(true);
@@ -47,21 +56,8 @@ const Game: FC = () => {
 
   const current = history[stepNumber];
   const winner = calculateWinner(current.squares);
-  const moves = history.map((step, move) => {
-    const desc = move ? `Go to move # ${move}` : "Go to game start";
-    return (
-      <li key={move}>
-        <button onClick={() => jumpTo(move)}>{desc}</button>
-      </li>
-    );
-  });
+  const status = getStatus(winner, xIsNext);
 
-  let status;
-  if (winner) {
-    status = `Winner: ${winner}`;
-  } else {
-    status = `Next player: ${xIsNext ? "X" : "O"}`;
-  }
   return (
     <div className="game">
       <div className="game-board">
@@ -69,7 +65,8 @@ const Game: FC = () => {
       </div>
       <div className="game-info">
         <div>{status}</div>
-        <ol>{moves}</ol>
+
+        <Moves history={history} onClick={jumpTo} />
       </div>
     </div>
   );
