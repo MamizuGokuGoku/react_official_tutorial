@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Board from "./board";
 import Moves from "./moves";
 import "../index.css";
+import styled from "styled-components";
 
 function calculateWinner(squares: string[]): string | null {
   const lines = [
@@ -31,7 +32,7 @@ function getStatus(winner: string | null, xIsNext: boolean): string {
   }
 }
 
-const Game = () => {
+const App = () => {
   const [history, setHistory] = useState([{ squares: Array(9).fill(null) }]);
   const [stepNumber, setStepNumber] = useState(0);
   const [xIsNext, setXIsNext] = useState(true);
@@ -59,17 +60,28 @@ const Game = () => {
   const status = getStatus(winner, xIsNext);
 
   return (
-    <div className="game">
-      <div className="game-board">
-        <Board squares={current.squares} onClick={(i) => handleClick(i)} />
-      </div>
-      <div className="game-info">
-        <div>{status}</div>
-
+    <Game>
+      <Board squares={current.squares} onClick={(i) => handleClick(i)} />
+      <GameInfo>
+        <Status>{status}</Status>
         <Moves history={history} onClick={jumpTo} />
-      </div>
-    </div>
+      </GameInfo>
+    </Game>
   );
 };
 
-export default Game;
+const Game = styled.div`
+  display: flex;
+  flex-direction: row;
+`;
+
+const GameInfo = styled.div`
+  margin-left: 20px;
+`;
+
+const Status = styled.div`
+  color: blue;
+  margin-bottom: 10px;
+`;
+
+export default App;

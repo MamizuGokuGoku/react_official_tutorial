@@ -11,11 +11,7 @@ const Moves: FC<MovesProps> = ({ history, onClick }) => (
       const desc = move ? `Go to move # ${move}` : "Go to game start";
       return (
         <li key={move}>
-          <button
-            onClick={() => {
-              onClick(move);
-            }}
-          >
+          <button onClick={() => {onClick(move);}}>
             {desc}
           </button>
         </li>
