@@ -4,7 +4,7 @@ import Moves from "./moves";
 import "../index.css";
 import styled from "styled-components";
 
-function calculateWinner(squares: string[]): string | null {
+function calculateWinner(squares: string[]): {winner:string,line:number[]} | null {
   const lines = [
     [0, 1, 2],
     [3, 4, 5],
@@ -18,16 +18,18 @@ function calculateWinner(squares: string[]): string | null {
   for (let i = 0; i < lines.length; i++) {
     const [a, b, c] = lines[i];
     if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      return squares[a];
+      return {winner:squares[a],line:lines[i]};
     }
   }
   return null;
 }
 
-function getStatus(winner: string | null, xIsNext: boolean): string {
-  if (winner) {
-    return `Winner: ${winner}`;
-  } else {
+function getStatus(winOrLose: {winner:string,line:number[]} | null, xIsNext: boolean, stepNumber:number): string {
+  if (winOrLose) {
+    return `Winner: ${winOrLose.winner}`;
+  }else if(stepNumber===9){
+    return "Draw";
+  }else {
     return `Next player: ${xIsNext ? "X" : "O"}`;
   }
 }
@@ -56,32 +58,43 @@ const App = () => {
   };
 
   const current = history[stepNumber];
-  const winner = calculateWinner(current.squares);
-  const status = getStatus(winner, xIsNext);
+  const winOrLose = calculateWinner(current.squares);
+  const status = getStatus(winOrLose, xIsNext, stepNumber);
 
   return (
-    <Game>
-      <Board squares={current.squares} onClick={(i) => handleClick(i)} />
-      <GameInfo>
-        <Status>{status}</Status>
-        <Moves history={history} onClick={jumpTo} />
-      </GameInfo>
-    </Game>
+    <Wrapper>
+      <h1>tic-tac-toe</h1>
+      <span>Referrer : </span>
+      <Link href="https://ja.reactjs.org/tutorial/tutorial.html" 
+         rel="noreferrer noopener" target="_blank" >https://ja.reactjs.org/tutorial/tutorial.html</Link> 
+      <Game>
+        <Status
+          style={{color: winOrLose? winOrLose.winner==='X'? "red" : "blue" : "black",}}
+          >{status}</Status>
+        <Board squares={current.squares} onClick={(i) => handleClick(i) } line={winOrLose?.line? winOrLose.line : [10,10,10]} />
+        <Moves history={history} onClick={jumpTo} ></Moves>
+      </Game>
+    </Wrapper>
   );
 };
 
-const Game = styled.div`
-  display: flex;
-  flex-direction: row;
+const Wrapper = styled.div`
+  text-align: center;
+  width: 600px;
+  margin: 0 auto; 
 `;
 
-const GameInfo = styled.div`
-  margin-left: 20px;
+const Link = styled.a`
+  display:inline;
+`;
+
+const Game = styled.div`
+  margin-top:50px;
 `;
 
 const Status = styled.div`
-  color: blue;
-  margin-bottom: 10px;
+  font-size:20px;
+  margin-bottom: 16px;
 `;
 
 export default App;
